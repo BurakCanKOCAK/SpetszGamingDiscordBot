@@ -117,11 +117,11 @@ bot.on('message', async message => {
 
         // Ooooh nice, combined conditions. <3
         if (!deleteCount || deleteCount < 2 || deleteCount > 100)
-            return message.reply(" silmek istedigin mesaj sayisini da bi belirtirsen sevinicem (Ornek : >sil 2). Minimum 2 , Maximum 100. ");
+            return message.reply(" silmek istedigin mesaj sayisini da bi belirtirsen sevinicem (Ornek : >sil 1). Minimum 1 , Maximum 100. ");
 
         // So we get our messages, and delete them. Simple enough, right?
         const fetched = await message.channel.fetchMessages({
-            limit: deleteCount
+            limit: deleteCount+1
         });
         message.channel.bulkDelete(fetched)
             .catch(error => message.reply(`...Haydaaa! ${error} hatasi yuzunden silemedim hocam, kusura bakma :/`));
