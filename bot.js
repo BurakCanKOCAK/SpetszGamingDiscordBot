@@ -104,7 +104,7 @@ bot.on('message', async message => {
 
     if (command ===  "SERVERPING") {
         const m = await message.channel.send("Ping?");
-        m.reply(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`);
+        m.reply(`Pong! Gecikme degeri : ${m.createdTimestamp - message.createdTimestamp}ms. Bot gecikmesi ise : ${Math.round(bot.ping)}ms`);
     }
 
 
