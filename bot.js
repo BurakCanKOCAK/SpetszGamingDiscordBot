@@ -116,7 +116,7 @@ bot.on('message', async message => {
         const deleteCount = parseInt(args[0], 10);
 
         // Ooooh nice, combined conditions. <3
-        if (!deleteCount || deleteCount < 2 || deleteCount > 100)
+        if (!deleteCount || deleteCount < 1 || deleteCount > 100)
             return message.reply(" silmek istedigin mesaj sayisini da bi belirtirsen sevinicem (Ornek : >sil 1). Minimum 1 , Maximum 100. ");
 
         // So we get our messages, and delete them. Simple enough, right?
