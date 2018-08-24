@@ -69,6 +69,15 @@ bot.on('message', async message => {
         message.reply('Aleykum Selam ' + owner + ' Baskan !');
     }
 
+    if(input.indexOf("?ATTACK") > -1 && message.author.username=="lazkopat53"){
+        message.reply(" Hop zenci sikerim seni !");
+    }
+    //else if(input.indexOf("?") > -1){
+    //    message.reply("Arkadasim yerli BOT kullanalim lutfen ! ");
+    //}
+
+
+
     //If message owner is a Bot then return/do not respond.
     if (message.author.bot) return;
 
