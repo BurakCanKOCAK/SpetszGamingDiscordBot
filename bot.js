@@ -7,11 +7,31 @@ const config = require("./config.json");
 // config.token contains the bot's token
 // config.prefix contains the message prefix.
 
-
+//Discord lib
 var Discord = require('discord.js')
 var bot = new Discord.Client()
 
+//Promises
+var Promise = require('promise');
+
+//db
+const Database = require('better-sqlite3');
+const db = new Database('./db.sqlite');
+
+//Data scraping from websites
+let Parser = require('rss-parser');
+let parser = new Parser();
+
+//WebHooks
+const Webhook = require("webhook-discord")
+const Hook = new Webhook("https://discordapp.com/api/webhooks/488217879997579265/jPf2yZmcK604PzNg3aubK_LzvkgSGmg2sp4i6wRjx7dHNcT6BFl1kShwt1A408yw6k0a")
+
 var statusCode=0;
+var isBotReady=false;
+
+function initDB(){
+    db.prepare("CREATE TABLE if not exists UserExperience (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
+}
 
 bot.on("ready", () => {
     // This event will run if the bot starts, and logs in, successfully.
@@ -20,9 +40,32 @@ bot.on("ready", () => {
     // docs refer to as the "ClientUser".
     //bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
     bot.user.setActivity(`or Not Playing...`);
+    isBotReady=true;
+    var itemCount=0;
+    (async () => {
+        let feed = await parser.parseURL('https://www.ntv.com.tr/gundem.rss');
+        console.log(feed.title);
+        var msgList=[];
+        const channel = bot.channels.find('name',"news");
+        itemCount= feed.items.reverse().length-3;
+        feed.items.slice().reverse().forEach(item => {
+          console.log(item.title + ':' + item.link)
+          const newsMsg=new Discord.RichEmbed()
+          newsMsg.setTitle(item.title)
+          newsMsg.setURL(item.link)
+          newsMsg.setThumbnail(item.content.split('\"')[1])
+          newsMsg.setDescription(item.contentSnippet)
+          msgList.push(newsMsg);
+        });
+
+        for(var i=0;i<5;i++){
+                channel.send(msgList[4-i])
+        }
+      })();
 });
 
 setInterval(setStatus,30000);
+//setInterval(checkNews,11000);
 
 function setStatus(){
     switch(statusCode)
@@ -50,6 +93,8 @@ function setStatus(){
     }
     console.log(statusCode);
 }
+
+
 
 bot.on("guildCreate", guild => {
     // This event triggers when the bot joins a guild.
@@ -102,6 +147,20 @@ bot.on('message', async message => {
         //message.channel.sendMessage('Aleykum Selam '+owner+' Baskan !');
     }
 
+    if(command === "HELP"){
+        const newsMsg=new Discord.RichEmbed()
+        newsMsg.setTitle("Help")
+        newsMsg.setAuthor("SpetszGamingBot")
+        newsMsg.setDescription("Komut listesi asagidaki gibidir;")
+        newsMsg.addField(">ping :", "Ping testi                     ",true)
+        newsMsg.addField(">serverping :", "Server ping testi",true)
+        newsMsg.addField(">sil x :", "Sondan x tane mesaji siler",true)
+        newsMsg.addField(">soyle x :", "Herhangi birseyi soyletebilirsiniz",true)
+        newsMsg.setFooter("SpetszGamingBot" + ' | by CRY0SS')
+        message.channel.send(newsMsg);
+    
+    }
+
     //Ask for Ping
     if (command === "PING") {
         message.channel.members.forEach(element => {
@@ -115,7 +174,6 @@ bot.on('message', async message => {
         const m = await message.channel.send("Ping?");
         m.reply(`Pong! Gecikme degeri : ${m.createdTimestamp - message.createdTimestamp}ms. Bot gecikmesi ise : ${Math.round(bot.ping)}ms`);
     }
-
 
     //Deletes messages 
     if (command ===  "SIL") {
